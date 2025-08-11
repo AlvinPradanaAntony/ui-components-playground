@@ -1,17 +1,31 @@
 "use client";
 import { useState, useMemo, useEffect, useRef } from "react";
 import CodeEditor from "@/components/CodeEditor";
+import IconUploader from "@/components/IconUploader";
 import type { ComponentCode, StyleKind } from "@/types";
-type Props = { initialCode: ComponentCode; onCodeChange?: (code: ComponentCode) => void; styleKind?: StyleKind; baselineKey?: string };
-export default function RightSidebar({ initialCode, onCodeChange, styleKind = "native", baselineKey }: Props) {
+type Props = {
+  initialCode: ComponentCode;
+  onCodeChange?: (code: ComponentCode) => void;
+  styleKind?: StyleKind;
+  baselineKey?: string;
+  // Optional icon controls when editing component thumbnails
+  iconUrl?: string;
+  onIconChange?: (url: string) => void;
+  iconLabel?: string;
+};
+export default function RightSidebar({ initialCode, onCodeChange, styleKind = "native", baselineKey, iconUrl, onIconChange, iconLabel = "Icon/Thumbnail" }: Props) {
   const [tab, setTab] = useState<"html" | "css" | "js">("html");
   const [html, setHtml] = useState(initialCode.html);
   const [css, setCss] = useState(initialCode.css);
   const [js, setJs] = useState(initialCode.js);
-  const [wrap, setWrap] = useState<boolean>(() => {
-    const saved = typeof window !== "undefined" ? window.localStorage.getItem("editor.wrap") : null;
-    return saved ? saved === "on" : true;
-  });
+  // Initialize uniformly for SSR/CSR to avoid hydration mismatch; load saved value after mount
+  const [wrap, setWrap] = useState<boolean>(true);
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("editor.wrap");
+      if (saved) setWrap(saved === "on");
+    } catch {}
+  }, []);
   // Capture a reset baseline per item; do not update on every keystroke from parent
   const baselineRef = useRef<ComponentCode>(initialCode);
   useEffect(() => {
@@ -69,8 +83,28 @@ export default function RightSidebar({ initialCode, onCodeChange, styleKind = "n
     document.body.removeChild(el);
     URL.revokeObjectURL(url);
   }
+  async function formatAll() {
+    try {
+      const prettier = await import("prettier/standalone");
+      const [pluginHtml, pluginBabel, pluginEstree, pluginPostCss] = await Promise.all([import("prettier/plugins/html"), import("prettier/plugins/babel"), import("prettier/plugins/estree"), import("prettier/plugins/postcss")]);
+      const nextHtml = await (prettier as any).format(html ?? "", { parser: "html", plugins: [pluginHtml] });
+      const nextCss = await (prettier as any).format(css ?? "", { parser: "css", plugins: [pluginPostCss] });
+      const nextJs = await (prettier as any).format(js ?? "", { parser: "babel", plugins: [pluginBabel, pluginEstree] });
+      setHtml(String(nextHtml).trim());
+      setCss(String(nextCss).trim());
+      setJs(String(nextJs).trim());
+    } catch (e: any) {
+      console.error("Format failed", e);
+      alert("Gagal auto format. Pastikan Prettier terpasang.");
+    }
+  }
   return (
     <aside className="h-screen sticky top-0 w-[var(--rightbar-width)] shrink-0 overflow-y-auto p-3 border-l border-gray-200 bg-white dark:bg-gray-950 dark:border-gray-800 hidden xl:block">
+      {onIconChange && (
+        <div className="mb-3">
+          <IconUploader label={iconLabel} value={iconUrl || ""} onChange={onIconChange} />
+        </div>
+      )}
       <div className="flex items-center justify-between mb-3 gap-2">
         <div className="flex gap-2">
           {(["html", "css", "js"] as const).map((k) => (
@@ -90,7 +124,7 @@ export default function RightSidebar({ initialCode, onCodeChange, styleKind = "n
           className="px-3 py-1.5 text-sm rounded-xl border"
           title={wrap ? "Matikan word wrap" : "Nyalakan word wrap"}
         >
-          {wrap ? "No Wrap" : "Wrap"}
+          <span suppressHydrationWarning>{wrap ? "No Wrap" : "Wrap"}</span>
         </button>
       </div>
       {tab === "html" && <CodeEditor language="html" value={html} onChange={setHtml} height={340} wrap={wrap} />} {tab === "css" && <CodeEditor language="css" value={css} onChange={setCss} height={340} wrap={wrap} />}{" "}
@@ -98,6 +132,9 @@ export default function RightSidebar({ initialCode, onCodeChange, styleKind = "n
       <div className="mt-3 flex gap-2">
         <button onClick={copy} className="px-3 py-1.5 rounded-xl border">
           Copy
+        </button>
+        <button onClick={formatAll} className="px-3 py-1.5 rounded-xl border">
+          Format
         </button>
         <button onClick={reset} className="px-3 py-1.5 rounded-xl border">
           Reset
