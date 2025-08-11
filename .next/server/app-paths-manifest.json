@@ -1,4 +1,0 @@
-{
-  "/page": "app/page.js",
-  "/component/[id]/page": "app/component/[id]/page.js"
-}
