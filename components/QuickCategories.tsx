@@ -7,10 +7,10 @@ export default function QuickCategories() {
 
   if (!categories.length) {
     return (
-      <div className="-mx-4 px-4 md:hidden">
-        <div className="flex gap-2 overflow-x-auto py-1">
+      <div className="lg:hidden">
+        <div className="flex gap-2 overflow-x-auto py-1 scrollbar-hide">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-8 w-20 rounded-full skeleton" />
+            <div key={i} className="h-7 sm:h-8 w-16 sm:w-20 rounded-full skeleton shrink-0" />
           ))}
         </div>
       </div>
@@ -18,15 +18,15 @@ export default function QuickCategories() {
   }
 
   return (
-    <div className="-mx-4 px-4 md:hidden">
-      <div className="flex gap-2 overflow-x-auto py-1">
+    <div className="lg:hidden">
+      <div className="flex gap-2 overflow-x-auto py-1 scrollbar-hide">
         <button
           onClick={() => setActiveCategory("all")}
           className={clsx(
-            "inline-flex items-center h-8 px-3 rounded-full border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 text-sm whitespace-nowrap transition-colors",
+            "inline-flex items-center h-7 sm:h-8 px-2.5 sm:px-3 rounded-full border transition-colors shrink-0 text-xs sm:text-sm whitespace-nowrap",
             activeCategoryId === "all"
-              ? "bg-brand-50 text-brand-700 dark:text-white border-brand-200 dark:border-brand-600"
-              : "text-gray-700 dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/5"
+              ? "bg-brand-500 text-white border-brand-500 shadow-sm"
+              : "border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 text-gray-700 dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/5"
           )}
         >
           Semua
@@ -36,10 +36,10 @@ export default function QuickCategories() {
             key={c.id}
             onClick={() => setActiveCategory(c.id)}
             className={clsx(
-              "inline-flex items-center h-8 px-3 rounded-full border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 text-sm whitespace-nowrap transition-colors",
+              "inline-flex items-center h-7 sm:h-8 px-2.5 sm:px-3 rounded-full border transition-colors shrink-0 text-xs sm:text-sm whitespace-nowrap",
               activeCategoryId === c.id
-                ? "bg-brand-50 text-brand-700 dark:text-white border-brand-200 dark:border-brand-600"
-                : "text-gray-700 dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/5"
+                ? "bg-brand-500 text-white border-brand-500 shadow-sm"
+                : "border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/70 text-gray-700 dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/5"
             )}
           >
             {c.name}

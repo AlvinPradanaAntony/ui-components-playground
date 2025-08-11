@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { usePlayground } from "@/store/usePlayground";
 import PreviewIframe from "@/components/PreviewIframe";
 import RightSidebar from "@/components/RightSidebar";
+import IconUploader from "@/components/IconUploader";
 import type { ComponentCode, StyleKind, UIComponentItem } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 import { useValidation } from "@/components/ui/ValidationModal";
@@ -123,24 +124,24 @@ export default function NewComponentPage() {
   }
 
   return (
-    <div className="flex">
-      <main id="content" role="main" className="flex-1 min-h-screen p-4 md:p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-start gap-3">
-            <button type="button" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40" onClick={() => router.back()}>
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-              Kembali
-            </button>
-            <div>
-              <h1 className="text-xl md:text-2xl font-semibold">Buat Komponen Baru</h1>
-              <div className="text-xs text-gray-500">Style: {style}</div>
+    <div className="flex min-h-screen pt-14">
+      <main id="content" role="main" className="flex-1 min-h-screen p-3 sm:p-4 xl:p-6 max-w-full overflow-hidden">
+        <div className="mb-4 sm:mb-6">
+          <button type="button" className="inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 mb-4" onClick={() => router.back()}>
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+            Kembali
+          </button>
+
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg sm:text-xl xl:text-2xl font-semibold">Buat Komponen Baru</h1>
+              <div className="text-xs text-gray-500 mt-1">Style: {style}</div>
             </div>
-          </div>
-          <div className="flex gap-2">
+
             <button
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-600"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm rounded-lg bg-brand-600 text-white hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-600"
               onClick={save}
               disabled={isLoading}
             >
@@ -155,10 +156,10 @@ export default function NewComponentPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-          <input className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950" placeholder="Nama" value={name} onChange={(e) => setName(e.target.value)} />
-          <input className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950" placeholder="Slug / ID" value={slug} onChange={(e) => setSlug(e.target.value)} />
-          <select className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-4 sm:mb-6">
+          <input className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40" placeholder="Nama komponen" value={name} onChange={(e) => setName(e.target.value)} />
+          <input className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40" placeholder="Slug / ID" value={slug} onChange={(e) => setSlug(e.target.value)} />
+          <select className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -166,7 +167,7 @@ export default function NewComponentPage() {
             ))}
           </select>
           <select
-            className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950"
+            className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
             value={style}
             onChange={(e) => {
               const next = e.target.value as StyleKind;
@@ -180,7 +181,12 @@ export default function NewComponentPage() {
           </select>
         </div>
 
-        <div className="h-[70vh]">
+        {/* Pada mobile/tablet tampilkan input upload icon di main */}
+        <div className="xl:hidden mb-2">
+          <IconUploader label="Icon/Thumbnail" value={previewThumbUrl || ""} onChange={setPreviewThumbUrl} />
+        </div>
+
+        <div className="h-[60vh] sm:h-[65vh] xl:h-[70vh] rounded-lg overflow-hidden">
           <PreviewIframe styleKind={style} code={code} />
         </div>
       </main>

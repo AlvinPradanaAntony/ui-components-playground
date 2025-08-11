@@ -15,7 +15,7 @@ export default function FilterTabs() {
     <div
       role="tablist"
       aria-label="Filter style"
-      className="inline-flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-gray-900/60 backdrop-blur px-1 py-1 shadow-soft"
+      className="inline-flex items-center gap-0.5 sm:gap-1 rounded-lg border border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-gray-900/60 backdrop-blur px-0.5 sm:px-1 py-0.5 sm:py-1 shadow-soft overflow-x-auto"
     >
       {tabs.map((t) => (
         <button
@@ -23,7 +23,7 @@ export default function FilterTabs() {
           role="tab"
           aria-selected={styleFilter === t.key}
           className={clsx(
-            "relative px-3.5 py-1.5 text-sm rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40",
+            "relative px-2 sm:px-3.5 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 whitespace-nowrap shrink-0",
             styleFilter === t.key
               ? "bg-brand-50 text-brand-700 dark:text-white"
               : "text-gray-600 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5"

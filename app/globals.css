@@ -2,10 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Layout constants */
+/* Layout constants - responsive */
 :root {
-  --sidebar-width: 300px;
-  --rightbar-width: 380px;
+  --sidebar-width: 280px;
+  --rightbar-width: 320px;
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --sidebar-width: 300px;
+    --rightbar-width: 380px;
+  }
+}
+
+@media (min-width: 1536px) {
+  :root {
+    --sidebar-width: 320px;
+    --rightbar-width: 400px;
+  }
 }
 
 /* Design Tokens (2025) using HSL for smooth theming */
@@ -121,4 +135,13 @@ body {
 @keyframes shimmer {
   0% { background-position: 100% 0; }
   100% { background-position: -100% 0; }
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
