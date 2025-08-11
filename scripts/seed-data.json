@@ -1,0 +1,340 @@
+{
+  "categories": [
+    {
+      "id": "buttons",
+      "name": "Buttons",
+      "slug": "buttons",
+      "thumbUrl": "/thumbs/buttons.svg",
+      "order": 1
+    },
+    {
+      "id": "cards",
+      "name": "Cards",
+      "slug": "cards",
+      "thumbUrl": "/thumbs/cards.svg",
+      "order": 2
+    },
+    {
+      "id": "inputs",
+      "name": "Inputs",
+      "slug": "inputs",
+      "thumbUrl": "/thumbs/inputs.svg",
+      "order": 3
+    },
+    {
+      "id": "alerts",
+      "name": "Alerts",
+      "slug": "alerts",
+      "thumbUrl": "/thumbs/alerts.svg",
+      "order": 4
+    }
+  ],
+  "components": [
+    {
+      "id": "btn-native-primary",
+      "name": "Button Primary (Native)",
+      "slug": "btn-native-primary",
+      "categoryId": "buttons",
+      "style": "native",
+      "tags": [],
+      "code": {
+        "html": "<button class=\"btn\">Primary</button>",
+        "css": ".btn{background:#2563eb;color:white;padding:.6rem 1rem;border:none;border-radius:.75rem;cursor:pointer}.btn:hover{filter:brightness(.95)}",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/buttons.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "btn-native-outline",
+      "name": "Button Outline (Native)",
+      "slug": "btn-native-outline",
+      "categoryId": "buttons",
+      "style": "native",
+      "tags": [],
+      "code": {
+        "html": "<button class=\"btn-outline\">Outline</button>",
+        "css": ".btn-outline{background:transparent;color:#2563eb;padding:.6rem 1rem;border:2px solid #2563eb;border-radius:.75rem;cursor:pointer}.btn-outline:hover{background:#eff6ff}",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/buttons.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "btn-native-danger",
+      "name": "Button Danger (Native)",
+      "slug": "btn-native-danger",
+      "categoryId": "buttons",
+      "style": "native",
+      "tags": [],
+      "code": {
+        "html": "<button class=\"btn-danger\">Danger</button>",
+        "css": ".btn-danger{background:#dc2626;color:white;padding:.6rem 1rem;border:none;border-radius:.75rem;cursor:pointer}.btn-danger:hover{filter:brightness(.95)}",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/buttons.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "btn-bs-primary",
+      "name": "Button Primary (Bootstrap)",
+      "slug": "btn-bs-primary",
+      "categoryId": "buttons",
+      "style": "bootstrap",
+      "tags": [],
+      "code": {
+        "html": "<button class=\"btn btn-primary\">Primary</button>",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/buttons.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "btn-bs-outline",
+      "name": "Button Outline (Bootstrap)",
+      "slug": "btn-bs-outline",
+      "categoryId": "buttons",
+      "style": "bootstrap",
+      "tags": [],
+      "code": {
+        "html": "<button class=\"btn btn-outline-primary\">Outline</button>",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/buttons.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "btn-bs-danger",
+      "name": "Button Danger (Bootstrap)",
+      "slug": "btn-bs-danger",
+      "categoryId": "buttons",
+      "style": "bootstrap",
+      "tags": [],
+      "code": {
+        "html": "<button class=\"btn btn-danger\">Danger</button>",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/buttons.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "btn-tw-primary",
+      "name": "Button Primary (Tailwind)",
+      "slug": "btn-tw-primary",
+      "categoryId": "buttons",
+      "style": "tailwind",
+      "tags": [],
+      "code": {
+        "html": "<button class=\"px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700\">Primary</button>",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/buttons.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "btn-tw-outline",
+      "name": "Button Outline (Tailwind)",
+      "slug": "btn-tw-outline",
+      "categoryId": "buttons",
+      "style": "tailwind",
+      "tags": [],
+      "code": {
+        "html": "<button class=\"px-4 py-2 rounded-xl border border-blue-600 text-blue-600 hover:bg-blue-50\">Outline</button>",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/buttons.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "btn-tw-danger",
+      "name": "Button Danger (Tailwind)",
+      "slug": "btn-tw-danger",
+      "categoryId": "buttons",
+      "style": "tailwind",
+      "tags": [],
+      "code": {
+        "html": "<button class=\"px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700\">Danger</button>",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/buttons.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "card-native",
+      "name": "Card (Native)",
+      "slug": "card-native",
+      "categoryId": "cards",
+      "style": "native",
+      "tags": [],
+      "code": {
+        "html": "<div class=\"card\"><h3>Title</h3><p>Card content...</p></div>",
+        "css": ".card{border:1px solid #e5e7eb;border-radius:1rem;padding:1rem;box-shadow:0 10px 30px rgba(0,0,0,.06)} h3{margin:0 0 .5rem}",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/cards.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "card-bs",
+      "name": "Card (Bootstrap)",
+      "slug": "card-bs",
+      "categoryId": "cards",
+      "style": "bootstrap",
+      "tags": [],
+      "code": {
+        "html": "<div class=\"card\" style=\"width: 18rem;\"><div class=\"card-body\"><h5 class=\"card-title\">Title</h5><p class=\"card-text\">Card content...</p></div></div>",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/cards.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "card-tw",
+      "name": "Card (Tailwind)",
+      "slug": "card-tw",
+      "categoryId": "cards",
+      "style": "tailwind",
+      "tags": [],
+      "code": {
+        "html": "<div class=\"rounded-2xl border border-gray-200 p-4 shadow\"><h3 class=\"font-semibold mb-2\">Title</h3><p>Card content...</p></div>",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/cards.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "input-native",
+      "name": "Input (Native)",
+      "slug": "input-native",
+      "categoryId": "inputs",
+      "style": "native",
+      "tags": [],
+      "code": {
+        "html": "<input class=\"input\" placeholder=\"Your name\" />",
+        "css": ".input{border:1px solid #e5e7eb;border-radius:.75rem;padding:.6rem .8rem;outline:none} .input:focus{border-color:#2563eb;box-shadow:0 0 0 3px #dbeafe}",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/inputs.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "input-bs",
+      "name": "Input (Bootstrap)",
+      "slug": "input-bs",
+      "categoryId": "inputs",
+      "style": "bootstrap",
+      "tags": [],
+      "code": {
+        "html": "<input class=\"form-control\" placeholder=\"Your name\">",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/inputs.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "input-tw",
+      "name": "Input (Tailwind)",
+      "slug": "input-tw",
+      "categoryId": "inputs",
+      "style": "tailwind",
+      "tags": [],
+      "code": {
+        "html": "<input class=\"border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500\" placeholder=\"Your name\">",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/inputs.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "alert-native",
+      "name": "Alert (Native)",
+      "slug": "alert-native",
+      "categoryId": "alerts",
+      "style": "native",
+      "tags": [],
+      "code": {
+        "html": "<div class=\"alert\">This is an alert</div>",
+        "css": ".alert{padding:.8rem 1rem;border-radius:.75rem;background:#fef3c7;color:#92400e;border:1px solid #fde68a}",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/alerts.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "alert-bs",
+      "name": "Alert (Bootstrap)",
+      "slug": "alert-bs",
+      "categoryId": "alerts",
+      "style": "bootstrap",
+      "tags": [],
+      "code": {
+        "html": "<div class=\"alert alert-warning\" role=\"alert\">This is an alert</div>",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/alerts.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    },
+    {
+      "id": "alert-tw",
+      "name": "Alert (Tailwind)",
+      "slug": "alert-tw",
+      "categoryId": "alerts",
+      "style": "tailwind",
+      "tags": [],
+      "code": {
+        "html": "<div class=\"rounded-xl border border-yellow-300 bg-yellow-50 text-yellow-900 px-4 py-2\">This is an alert</div>",
+        "css": "",
+        "js": ""
+      },
+      "props": {},
+      "previewThumbUrl": "/thumbs/alerts.svg",
+      "createdAt": 1754871533615,
+      "updatedAt": 1754871533615
+    }
+  ]
+}
