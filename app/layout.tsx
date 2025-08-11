@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
+import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
+import { ValidationProvider } from "@/components/ui/ValidationModal";
 import Topbar from "@/components/Topbar";
 
 export const metadata: Metadata = {
@@ -43,8 +45,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased font-sans">
         <ToastProvider>
-          <Topbar />
-          {children}
+          <ConfirmProvider>
+            <ValidationProvider>
+              <Topbar />
+              {children}
+            </ValidationProvider>
+          </ConfirmProvider>
         </ToastProvider>
       </body>
     </html>

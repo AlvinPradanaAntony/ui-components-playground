@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useRef, useState } from "react";
+import { useToast } from "@/components/ui/Toast";
 
 type Props = {
   label?: string;
@@ -22,6 +23,7 @@ export default function IconUploader({
   previewClassName,
   compact = false,
 }: Props) {
+  const toast = useToast();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -47,7 +49,7 @@ export default function IconUploader({
       const dataUrl = await readFile(file);
       onChange(dataUrl);
     } catch (error) {
-      alert((error as Error).message || "Upload gagal");
+      toast.error((error as Error).message || "Upload gagal");
     }
   }, [onChange, readFile]);
 

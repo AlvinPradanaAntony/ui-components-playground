@@ -67,7 +67,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {children}
       {container &&
         createPortal(
-          <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[9999] w-[min(92vw,360px)] space-y-3">
+          <div className="fixed top-4 right-4 md:top-6 md:right-6 z-[9999] w-[min(92vw,360px)] space-y-3">
             <AnimatePresence initial={false}>
               {toasts.map((t) => (
                 <motion.div
