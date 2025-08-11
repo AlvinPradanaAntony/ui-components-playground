@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import CodeEditor from "@/components/CodeEditor";
 import IconUploader from "@/components/IconUploader";
 import type { ComponentCode, StyleKind } from "@/types";
+import { useToast } from "@/components/ui/Toast";
 type Props = {
   initialCode: ComponentCode;
   onCodeChange?: (code: ComponentCode) => void;
@@ -14,6 +15,7 @@ type Props = {
   iconLabel?: string;
 };
 export default function RightSidebar({ initialCode, onCodeChange, styleKind = "native", baselineKey, iconUrl, onIconChange, iconLabel = "Icon/Thumbnail" }: Props) {
+  const toast = useToast();
   const [tab, setTab] = useState<"html" | "css" | "js">("html");
   const [html, setHtml] = useState(initialCode.html);
   const [css, setCss] = useState(initialCode.css);
@@ -40,66 +42,86 @@ export default function RightSidebar({ initialCode, onCodeChange, styleKind = "n
   useEffect(() => {
     onCodeChange?.(combined);
   }, [combined, onCodeChange]);
-  async function copy() {
-    const text = JSON.stringify(combined, null, 2);
+  const copyToClipboard = async (text: string) => {
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
       } else {
         const ta = document.createElement("textarea");
         ta.value = text;
-        ta.style.position = "fixed";
-        ta.style.left = "-9999px";
+        ta.style.cssText = "position:fixed;left:-9999px";
         document.body.appendChild(ta);
-        ta.focus();
         ta.select();
         document.execCommand("copy");
         document.body.removeChild(ta);
       }
-      alert("Disalin ke clipboard");
+      return true;
     } catch {
-      alert("Gagal menyalin");
+      return false;
     }
-  }
-  function reset() {
-    const base = baselineRef.current;
-    setHtml(base.html);
-    setCss(base.css);
-    setJs(base.js);
-  }
-  function download() {
-    const bootstrap = `<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\" />\n<script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js\"></script>`;
-    const tailwind = `<script src=\"https://cdn.tailwindcss.com\"></script>\n<script>tailwind.config={theme:{extend:{}}}</script>`;
+  };
+
+  const copy = async () => {
+    const success = await copyToClipboard(JSON.stringify(combined, null, 2));
+    toast[success ? "success" : "error"](success ? "Disalin ke clipboard" : "Gagal menyalin");
+  };
+
+  const reset = () => {
+    const { html: baseHtml, css: baseCss, js: baseJs } = baselineRef.current;
+    setHtml(baseHtml);
+    setCss(baseCss);
+    setJs(baseJs);
+  };
+
+  const getStyleDependencies = () => {
+    const deps = {
+      bootstrap: `<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />\n<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>`,
+      tailwind: `<script src="https://cdn.tailwindcss.com"></script>\n<script>tailwind.config={theme:{extend:{}}}</script>`,
+      native: ""
+    };
+    return deps[styleKind] || "";
+  };
+
+  const download = () => {
     const baseStyle = "<style>*,*:before,*:after{box-sizing:border-box}html,body{height:100%}body{padding:16px;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto}</style>";
-    const deps = styleKind === "bootstrap" ? bootstrap : styleKind === "tailwind" ? tailwind : "";
-    const full = `<!doctype html><html><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>${baseStyle}${deps}<style>${css}</style></head><body>${html}<script>${js}<\/script></body></html>`;
-    const blob = new Blob([full], { type: "text/html" });
+    const deps = getStyleDependencies();
+    const fullHtml = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>${baseStyle}${deps}<style>${css}</style></head><body>${html}<script>${js}</script></body></html>`;
+    
+    const blob = new Blob([fullHtml], { type: "text/html" });
     const url = URL.createObjectURL(blob);
-    const el = document.createElement("a");
-    el.href = url;
-    el.download = "component.html";
-    document.body.appendChild(el);
-    el.click();
-    document.body.removeChild(el);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "component.html";
+    link.click();
     URL.revokeObjectURL(url);
-  }
-  async function formatAll() {
+  };
+
+  const formatAll = async () => {
     try {
-      const prettier = await import("prettier/standalone");
-      const [pluginHtml, pluginBabel, pluginEstree, pluginPostCss] = await Promise.all([import("prettier/plugins/html"), import("prettier/plugins/babel"), import("prettier/plugins/estree"), import("prettier/plugins/postcss")]);
-      const nextHtml = await (prettier as any).format(html ?? "", { parser: "html", plugins: [pluginHtml] });
-      const nextCss = await (prettier as any).format(css ?? "", { parser: "css", plugins: [pluginPostCss] });
-      const nextJs = await (prettier as any).format(js ?? "", { parser: "babel", plugins: [pluginBabel, pluginEstree] });
-      setHtml(String(nextHtml).trim());
-      setCss(String(nextCss).trim());
-      setJs(String(nextJs).trim());
-    } catch (e: any) {
+      const [prettier, pluginHtml, pluginBabel, pluginEstree, pluginPostCss] = await Promise.all([
+        import("prettier/standalone"),
+        import("prettier/plugins/html"),
+        import("prettier/plugins/babel"),
+        import("prettier/plugins/estree"),
+        import("prettier/plugins/postcss")
+      ]);
+
+      const [formattedHtml, formattedCss, formattedJs] = await Promise.all([
+        (prettier as any).format(html ?? "", { parser: "html", plugins: [pluginHtml] }),
+        (prettier as any).format(css ?? "", { parser: "css", plugins: [pluginPostCss] }),
+        (prettier as any).format(js ?? "", { parser: "babel", plugins: [pluginBabel, pluginEstree] })
+      ]);
+
+      setHtml(formattedHtml.trim());
+      setCss(formattedCss.trim());
+      setJs(formattedJs.trim());
+    } catch (e) {
       console.error("Format failed", e);
-      alert("Gagal auto format. Pastikan Prettier terpasang.");
+      toast.error("Gagal auto format. Pastikan Prettier terpasang.");
     }
-  }
+  };
   return (
-    <aside className="h-screen sticky top-0 w-[var(--rightbar-width)] shrink-0 overflow-y-auto p-3 border-l border-gray-200 bg-white dark:bg-gray-950 dark:border-gray-800 hidden xl:block">
+    <aside aria-label="Panel editor kode" className="h-[calc(100vh-3.5rem)] sticky top-14 w-[var(--rightbar-width)] shrink-0 overflow-y-auto p-3 border-l border-gray-200 bg-white dark:bg-gray-950 dark:border-gray-800 hidden xl:block">
       {onIconChange && (
         <div className="mb-3">
           <IconUploader label={iconLabel} value={iconUrl || ""} onChange={onIconChange} />
@@ -107,41 +129,57 @@ export default function RightSidebar({ initialCode, onCodeChange, styleKind = "n
       )}
       <div className="flex items-center justify-between mb-3 gap-2">
         <div className="flex gap-2">
-          {(["html", "css", "js"] as const).map((k) => (
-            <button key={k} onClick={() => setTab(k)} className={`px-3 py-1.5 text-sm rounded-xl border ${tab === k ? "bg-gray-100 dark:bg-gray-800" : ""}`}>
-              {k.toUpperCase()}
+          {(["html", "css", "js"] as const).map((lang) => (
+            <button
+              key={lang}
+              onClick={() => setTab(lang)}
+              className={`px-3 py-1.5 text-sm rounded-xl border transition-colors ${
+                tab === lang ? "bg-gray-100 dark:bg-gray-800" : "hover:bg-gray-50 dark:hover:bg-gray-900"
+              }`}
+            >
+              {lang.toUpperCase()}
             </button>
           ))}
         </div>
         <button
           onClick={() => {
-            const next = !wrap;
-            setWrap(next);
+            const newWrap = !wrap;
+            setWrap(newWrap);
             try {
-              window.localStorage.setItem("editor.wrap", next ? "on" : "off");
+              localStorage.setItem("editor.wrap", newWrap ? "on" : "off");
             } catch {}
           }}
-          className="px-3 py-1.5 text-sm rounded-xl border"
+          className="px-3 py-1.5 text-sm rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
           title={wrap ? "Matikan word wrap" : "Nyalakan word wrap"}
         >
           <span suppressHydrationWarning>{wrap ? "No Wrap" : "Wrap"}</span>
         </button>
       </div>
-      {tab === "html" && <CodeEditor language="html" value={html} onChange={setHtml} height={340} wrap={wrap} />} {tab === "css" && <CodeEditor language="css" value={css} onChange={setCss} height={340} wrap={wrap} />}{" "}
-      {tab === "js" && <CodeEditor language="javascript" value={js} onChange={setJs} height={340} wrap={wrap} />}
+
+      {/* Code Editor */}
+      <CodeEditor
+        language={tab === "js" ? "javascript" : tab}
+        value={tab === "html" ? html : tab === "css" ? css : js}
+        onChange={tab === "html" ? setHtml : tab === "css" ? setCss : setJs}
+        height={340}
+        wrap={wrap}
+      />
+
       <div className="mt-3 flex gap-2">
-        <button onClick={copy} className="px-3 py-1.5 rounded-xl border">
-          Copy
-        </button>
-        <button onClick={formatAll} className="px-3 py-1.5 rounded-xl border">
-          Format
-        </button>
-        <button onClick={reset} className="px-3 py-1.5 rounded-xl border">
-          Reset
-        </button>
-        <button onClick={download} className="px-3 py-1.5 rounded-xl border">
-          Download
-        </button>
+        {[
+          { label: "Copy", onClick: copy },
+          { label: "Format", onClick: formatAll },
+          { label: "Reset", onClick: reset },
+          { label: "Download", onClick: download }
+        ].map(({ label, onClick }) => (
+          <button
+            key={label}
+            onClick={onClick}
+            className="px-3 py-1.5 rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+          >
+            {label}
+          </button>
+        ))}
       </div>
       <div className="mt-6 text-xs text-gray-500">Edit kode lalu lihat hasilnya pada preview di tengah.</div>
     </aside>

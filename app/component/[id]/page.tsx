@@ -5,20 +5,26 @@ import { usePlayground } from "@/store/usePlayground";
 import PreviewIframe from "@/components/PreviewIframe";
 import RightSidebar from "@/components/RightSidebar";
 import type { ComponentCode, UIComponentItem } from "@/types";
-import IconUploader from "@/components/IconUploader";
+import { useToast } from "@/components/ui/Toast";
+
 export default function ComponentDetailPage() {
   const params = useParams<{ id: string | string[] }>();
   const router = useRouter();
+  const toast = useToast();
   const id = Array.isArray(params?.id) ? params?.id[0] : params?.id;
   const { components, categories, loadAll, upsertComponent, deleteComponent } = usePlayground();
+
   const [code, setCode] = useState<ComponentCode | null>(null);
   const [name, setName] = useState<string>("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [previewThumbUrl, setPreviewThumbUrl] = useState<string>("");
+
   const item = useMemo(() => components.find((c) => c.id === id), [components, id]);
+
   useEffect(() => {
     loadAll();
   }, [loadAll]);
+
   useEffect(() => {
     if (item) {
       setCode(item.code);
@@ -27,44 +33,90 @@ export default function ComponentDetailPage() {
       setPreviewThumbUrl(item.previewThumbUrl || "");
     }
   }, [item]);
-  if (!item || !code) return <div className="p-6">Memuat...</div>;
+
+  if (!item || !code)
+    return (
+      <div className="p-6">
+        <div className="h-8 w-48 rounded skeleton" />
+        <div className="mt-3 h-5 w-32 rounded skeleton" />
+        <div className="mt-4 h-[60vh] rounded-xl skeleton" />
+      </div>
+    );
+
   async function save() {
-    const next: UIComponentItem = { ...item, name, categoryId, code, previewThumbUrl: previewThumbUrl || undefined, updatedAt: Date.now() };
-    await upsertComponent(next);
-    alert("Tersimpan!");
-  }
-  async function remove() {
-    if (confirm("Hapus komponen ini?")) {
-      await deleteComponent(item.id);
-      alert("Dihapus");
-      router.push("/");
+    try {
+      const next: UIComponentItem = {
+        ...item,
+        name,
+        categoryId,
+        code,
+        previewThumbUrl: previewThumbUrl || undefined,
+        updatedAt: Date.now(),
+      };
+      await upsertComponent(next);
+      toast.success("Perubahan tersimpan", { title: "Sukses" });
+    } catch (e: any) {
+      toast.error("Gagal menyimpan perubahan");
     }
   }
+
+  async function remove() {
+    try {
+      if (confirm("Hapus komponen ini?")) {
+        await deleteComponent(item.id);
+        toast.success("Komponen dihapus");
+        router.push("/");
+      }
+    } catch {
+      toast.error("Gagal menghapus komponen");
+    }
+  }
+
   return (
     <div className="flex">
-      <main className="flex-1 min-h-screen p-4 md:p-6">
+      <main id="content" role="main" className="flex-1 min-h-screen p-4 md:p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-start gap-3">
-            <button className="px-3 py-1.5 rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-900" onClick={() => router.back()}>
+            <button
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40"
+              onClick={() => router.back()}
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
               Kembali
             </button>
             <div>
-              <input className="text-xl font-semibold bg-transparent border-b focus:outline-none" value={name} onChange={(e) => setName(e.target.value)} />
+              <input
+                className="text-xl md:text-2xl font-semibold bg-transparent border-b border-transparent focus:border-brand-500/40 focus:outline-none"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
               <div className="text-xs text-gray-500">Style: {item.style}</div>
             </div>
           </div>
           <div className="flex gap-2">
-            <select className="px-3 py-1.5 rounded-xl border" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+            <select
+              className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950"
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+            >
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
             </select>
-            <button className="px-3 py-1.5 rounded-xl border" onClick={save}>
+            <button
+              className="px-3 py-1.5 rounded-lg bg-brand-600 text-white hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50"
+              onClick={save}
+            >
               Save
             </button>
-            <button className="px-3 py-1.5 rounded-xl border text-red-600" onClick={remove}>
+            <button
+              className="px-3 py-1.5 rounded-lg border border-red-300/50 text-red-600 hover:bg-red-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
+              onClick={remove}
+            >
               Delete
             </button>
           </div>
@@ -73,7 +125,15 @@ export default function ComponentDetailPage() {
           <PreviewIframe styleKind={item.style} code={code} />
         </div>
       </main>
-      <RightSidebar initialCode={code} onCodeChange={setCode} styleKind={item.style} baselineKey={item.id} iconUrl={previewThumbUrl} onIconChange={setPreviewThumbUrl} iconLabel="Icon/Thumbnail" />
+      <RightSidebar
+        initialCode={code}
+        onCodeChange={setCode}
+        styleKind={item.style}
+        baselineKey={item.id}
+        iconUrl={previewThumbUrl}
+        onIconChange={setPreviewThumbUrl}
+        iconLabel="Icon/Thumbnail"
+      />
     </div>
   );
 }

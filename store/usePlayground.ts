@@ -7,6 +7,7 @@ type State = {
   components: UIComponentItem[];
   styleFilter: StyleKind | "all";
   activeCategoryId: string | "all";
+  query: string;
   loading: boolean;
   error?: string;
   // load
@@ -14,6 +15,7 @@ type State = {
   // filters
   setStyleFilter: (f: State["styleFilter"]) => void;
   setActiveCategory: (id: State["activeCategoryId"]) => void;
+  setQuery: (q: string) => void;
   // components
   upsertComponent: (item: UIComponentItem) => Promise<void>;
   deleteComponent: (id: string) => Promise<void>;
@@ -26,6 +28,7 @@ export const usePlayground = create<State>((set, get) => ({
   components: [],
   styleFilter: "all",
   activeCategoryId: "all",
+  query: "",
   loading: false,
   async loadAll() {
     try {
@@ -41,6 +44,9 @@ export const usePlayground = create<State>((set, get) => ({
   },
   setActiveCategory(id) {
     set({ activeCategoryId: id });
+  },
+  setQuery(q) {
+    set({ query: q });
   },
   async upsertComponent(item) {
     await dataSource.upsertComponent(item);

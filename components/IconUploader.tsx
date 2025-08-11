@@ -25,91 +25,108 @@ export default function IconUploader({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
-  const readFile = useCallback(
-    (file: File) =>
-      new Promise<string>((resolve, reject) => {
-        if (file.size > maxSize) return reject(new Error(`File terlalu besar (> ${(maxSize / 1024).toFixed(0)}KB)`));
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result || ""));
-        reader.onerror = () => reject(reader.error || new Error("Gagal membaca file"));
-        reader.readAsDataURL(file);
-      }),
-    [maxSize]
-  );
+  const readFile = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (file.size > maxSize) {
+        reject(new Error(`File terlalu besar (> ${Math.round(maxSize / 1024)}KB)`));
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error("Gagal membaca file"));
+      reader.readAsDataURL(file);
+    });
+  }, [maxSize]);
 
-  const handleFiles = useCallback(
-    async (files: FileList | File[]) => {
-      const file = (files as FileList)[0] || (files as File[])[0];
-      if (!file) return;
-      try {
-        const dataUrl = await readFile(file);
-        onChange(dataUrl);
-      } catch (e: any) {
-        alert(e?.message || "Upload gagal");
-      }
-    },
-    [onChange, readFile]
-  );
+  const handleFiles = useCallback(async (files: FileList | File[]) => {
+    const file = files[0];
+    if (!file) return;
+    
+    try {
+      const dataUrl = await readFile(file);
+      onChange(dataUrl);
+    } catch (error) {
+      alert((error as Error).message || "Upload gagal");
+    }
+  }, [onChange, readFile]);
 
-  const onDrop = useCallback(
-    async (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setDragOver(false);
-      const dt = e.dataTransfer;
-      if (!dt) return;
-      if (dt.files && dt.files.length) {
-        return handleFiles(dt.files);
-      }
-      // If a URL was dropped
-      for (const item of Array.from(dt.items)) {
-        if (item.kind === "string" && item.type === "text/uri-list") {
-          item.getAsString((s) => onChange(s.trim()));
-          return;
-        }
-      }
-    },
-    [handleFiles, onChange]
-  );
+  const handleDragEvent = useCallback((e: React.DragEvent, isDragOver: boolean) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(isDragOver);
+  }, []);
+
+  const onDrop = useCallback(async (e: React.DragEvent) => {
+    handleDragEvent(e, false);
+    
+    const { dataTransfer } = e;
+    if (!dataTransfer) return;
+
+    // Handle file drops
+    if (dataTransfer.files?.length) {
+      await handleFiles(dataTransfer.files);
+      return;
+    }
+
+    // Handle URL drops
+    const urlItem = Array.from(dataTransfer.items).find(
+      item => item.kind === "string" && item.type === "text/uri-list"
+    );
+    
+    if (urlItem) {
+      urlItem.getAsString(url => onChange(url.trim()));
+    }
+  }, [handleFiles, onChange, handleDragEvent]);
 
   const triggerPick = useCallback(() => inputRef.current?.click(), []);
+
+  const dropZoneClasses = `relative border rounded-xl bg-white/50 dark:bg-gray-900/50 flex items-center justify-center text-center ${
+    compact ? "h-12 w-20" : "h-28 w-full"
+  } ${dragOver ? "border-blue-500 ring-2 ring-blue-400" : "border-dashed"}`;
+
+  const imageClasses = `object-contain ${compact ? "h-10 w-16" : "h-24 w-auto"} ${previewClassName || ""}`;
 
   return (
     <div className={className}>
       {label && <label className="text-sm mb-1 block">{label}</label>}
       <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setDragOver(true);
-        }}
-        onDragLeave={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setDragOver(false);
-        }}
+        onDragOver={(e) => handleDragEvent(e, true)}
+        onDragLeave={(e) => handleDragEvent(e, false)}
         onDrop={onDrop}
-        className={"relative border rounded-xl bg-white/50 dark:bg-gray-900/50 flex items-center justify-center text-center " + (compact ? "h-12 w-20" : "h-28 w-full") + (" " + (dragOver ? "border-blue-500 ring-2 ring-blue-400" : "border-dashed"))}
+        className={dropZoneClasses}
       >
         {value ? (
           <>
-            <img src={value} alt="icon" className={"object-contain " + (compact ? "h-10 w-16" : "h-24 w-auto") + (previewClassName ? " " + previewClassName : "")} />
+            <img src={value} alt="icon" className={imageClasses} />
             <div className="absolute top-1 right-1 flex gap-1">
-              <button onClick={() => onChange("")} className="px-2 py-0.5 text-xs rounded-lg border bg-white/80 backdrop-blur">
-                Hapus
-              </button>
-              <button onClick={triggerPick} className="px-2 py-0.5 text-xs rounded-lg border bg-white/80 backdrop-blur">
-                Ganti
-              </button>
+              {[
+                { label: "Hapus", onClick: () => onChange("") },
+                { label: "Ganti", onClick: triggerPick }
+              ].map(({ label, onClick }) => (
+                <button
+                  key={label}
+                  onClick={onClick}
+                  className="px-2 py-0.5 text-xs rounded-lg border bg-white/80 backdrop-blur hover:bg-white/90 transition-colors"
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           </>
         ) : (
-          <button type="button" onClick={triggerPick} className="text-xs text-gray-600">
+          <button type="button" onClick={triggerPick} className="text-xs text-gray-600 hover:text-gray-800 transition-colors">
             <div className="font-medium">Drag & drop icon di sini</div>
             <div>atau klik untuk pilih file (SVG/PNG/JPG)</div>
           </button>
         )}
-        <input ref={inputRef} type="file" accept={accept} className="hidden" onChange={(e) => e.target.files && handleFiles(e.target.files)} />
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          className="hidden"
+          onChange={(e) => e.target.files && handleFiles(e.target.files)}
+        />
       </div>
     </div>
   );
