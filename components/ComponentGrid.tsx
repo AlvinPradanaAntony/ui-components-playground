@@ -56,7 +56,7 @@ export default function ComponentGrid() {
             <div className="flex-1 min-w-0 mr-3">
               <div className="font-semibold text-sm sm:text-base truncate">{item.name}</div>
               <div className="mt-1 flex items-center gap-1 text-[10px] sm:text-[11px] text-gray-600 dark:text-gray-300 flex-wrap">
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-brand-50 text-brand-700 dark:text-white shrink-0">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-brand-50 text-brand-500 dark:bg-blue-800/40   shrink-0">
                   {item.style}
                 </span>
                 {(item.tags || []).slice(0, 1).map((t) => (

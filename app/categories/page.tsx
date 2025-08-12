@@ -237,7 +237,7 @@ export default function CategoriesPage() {
                         onChange={(v) => handleCategoryChange(cat.id, 'thumbUrl', v)}
                       />
                       <button
-                        className="p-2 rounded-lg border border-red-300/50 text-red-600 hover:bg-red-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 ml-auto"
+                        className="p-2 rounded-lg border border-red-300/50 bg-red-500/10 text-red-600 hover:bg-red-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 ml-auto"
                         title="Hapus kategori"
                         onClick={async () => {
                           const confirmed = await confirm.confirm({
@@ -326,7 +326,7 @@ export default function CategoriesPage() {
                         placeholder="slug-kategori"
                       />
                       <button
-                        className="p-1.5 rounded-lg border border-red-300/50 text-red-600 hover:bg-red-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
+                        className="p-1.5 rounded-lg border bg-red-500/10 border-red-300/50 text-red-600 hover:bg-red-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
                         title="Hapus kategori"
                         onClick={async () => {
                           const confirmed = await confirm.confirm({

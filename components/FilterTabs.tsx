@@ -25,7 +25,7 @@ export default function FilterTabs() {
           className={clsx(
             "relative px-2 sm:px-3.5 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 whitespace-nowrap shrink-0",
             styleFilter === t.key
-              ? "bg-brand-50 text-brand-700 dark:text-white"
+              ? "bg-brand-500 text-white dark:text-white"
               : "text-gray-600 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5"
           )}
           onClick={() => setStyleFilter(t.key as any)}

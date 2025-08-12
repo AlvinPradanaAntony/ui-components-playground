@@ -5,11 +5,14 @@ import type { ComponentCode, StyleKind } from "@/types";
 type Props = { styleKind: StyleKind; code: ComponentCode; className?: string };
 
 function buildInitialDoc(styleKind: StyleKind) {
-  const bootstrap = `<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" /><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>`;
+  const bootstrapCSS = `<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />`;
+  const bootstrapJS = `<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>`;
   const tailwind = `<script src="https://cdn.tailwindcss.com"></script><script>tailwind.config={theme:{extend:{}}}</script>`;
   const base = "<style>*,*:before,*:after{box-sizing:border-box}html,body{height:100%}body{padding:16px;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto}</style>";
-  const deps = styleKind === "bootstrap" ? bootstrap : styleKind === "tailwind" ? tailwind : "";
   
+  const headDeps = styleKind === "bootstrap" ? bootstrapCSS : styleKind === "tailwind" ? tailwind : "";
+  const bodyDeps = styleKind === "bootstrap" ? bootstrapJS : "";
+
   // Create initial HTML with message listener for real-time updates
   // The body will be directly replaced with user's HTML content
   const html = `<!doctype html>
@@ -18,7 +21,7 @@ function buildInitialDoc(styleKind: StyleKind) {
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   ${base}
-  ${deps}
+  ${headDeps}
   <style id="user-css"></style>
   <script>
     // Global message handler that persists in head
@@ -68,9 +71,10 @@ function buildInitialDoc(styleKind: StyleKind) {
 </head>
 <body>
   <!-- User's HTML content will be inserted here -->
+  ${bodyDeps}
 </body>
 </html>`;
-  
+
   return html;
 }
 
@@ -90,22 +94,25 @@ export default function PreviewIframe({ styleKind, code, className }: Props) {
   // Listen for iframe ready message
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data && event.data.type === 'IFRAME_READY') {
+      if (event.data && event.data.type === "IFRAME_READY") {
         setReady(true);
       }
     };
 
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
   }, []);
 
   // Send code updates to iframe when ready and code changes
   useEffect(() => {
     if (ready && iframeRef.current && iframeRef.current.contentWindow) {
-      iframeRef.current.contentWindow.postMessage({
-        type: 'UPDATE_CODE',
-        code: code
-      }, '*');
+      iframeRef.current.contentWindow.postMessage(
+        {
+          type: "UPDATE_CODE",
+          code: code,
+        },
+        "*"
+      );
     }
   }, [ready, code]);
 
@@ -115,25 +122,20 @@ export default function PreviewIframe({ styleKind, code, className }: Props) {
   }, [srcDoc]);
 
   const iframeClass =
-    (className || "w-full h-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white") +
+    (className ||
+      // Light & dark surface backgrounds
+      "w-full h-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-surface-100") +
     " transition-opacity duration-200 " +
     (loaded ? "opacity-100" : "opacity-0");
 
   return (
     <div className="relative w-full h-full">
       {!loaded && (
-        <div className="absolute inset-0 rounded-xl border border-gray-200 dark:border-gray-800 bg-white overflow-hidden">
+        <div className="absolute inset-0 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-surface-100 overflow-hidden">
           <div className="h-full w-full skeleton" />
         </div>
       )}
-      <iframe
-        ref={iframeRef}
-        className={iframeClass}
-        title={`Pratinjau komponen (style: ${styleKind})`}
-        sandbox="allow-scripts allow-forms"
-        srcDoc={srcDoc}
-        onLoad={() => setLoaded(true)}
-      />
+      <iframe ref={iframeRef} className={iframeClass} title={`Pratinjau komponen (style: ${styleKind})`} sandbox="allow-scripts allow-forms" srcDoc={srcDoc} onLoad={() => setLoaded(true)} />
     </div>
   );
 }

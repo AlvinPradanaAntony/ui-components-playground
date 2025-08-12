@@ -182,7 +182,7 @@ export default function ComponentDetailPage() {
                     )}
                     {isLoading ? "Menyimpan..." : "Save"}
                   </button>
-                  <button className="px-3 py-1.5 text-sm rounded-lg border border-red-300/50 text-red-600 hover:bg-red-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50" onClick={remove}>
+                  <button className="px-3 py-1.5 text-sm rounded-lg border bg-red-500/10 border-red-300/50 text-red-600 hover:bg-red-500 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50" onClick={remove}>
                     Delete
                   </button>
                 </div>

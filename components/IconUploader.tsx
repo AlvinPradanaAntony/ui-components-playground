@@ -125,7 +125,11 @@ export default function IconUploader({
                 <button
                   key={label}
                   onClick={onClick}
-                  className="px-2 py-0.5 text-xs rounded-lg border bg-white/80 backdrop-blur hover:bg-white/90 transition-colors"
+                  className={`px-2 py-0.5 text-xs rounded-lg border backdrop-blur transition-colors ${
+                    label === "Hapus"
+                      ? "bg-red-50/90 dark:bg-red-900/50 border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 hover:bg-red-100/90 dark:hover:bg-red-900/70"
+                      : "bg-blue-50/90 dark:bg-blue-900/50 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-100/90 dark:hover:bg-blue-900/70"
+                  }`}
                   title={label}
                 >
                   {compact ? icon : label}

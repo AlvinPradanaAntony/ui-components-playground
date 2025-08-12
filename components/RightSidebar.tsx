@@ -71,7 +71,7 @@ const EditorContent = ({
     <div className="flex items-center justify-between mb-3 gap-1 xl:gap-2">
       <div className="flex gap-1 xl:gap-2">
         {(["html", "css", "js"] as const).map((lang) => (
-          <button key={lang} onClick={() => setTab(lang)} className={`px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl border transition-colors ${tab === lang ? "bg-gray-100 dark:bg-gray-800" : "hover:bg-gray-50 dark:hover:bg-gray-900"}`}>
+          <button key={lang} onClick={() => setTab(lang)} className={`px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl transition-colors ${tab === lang ? "bg-brand-500 text-white" : "bg-gray-100 hover:bg-gray-200 dark:bg-surface-100 dark:hover:bg-brand-500/40"}`}>
             {lang.toUpperCase()}
           </button>
         ))}
@@ -84,7 +84,7 @@ const EditorContent = ({
             localStorage.setItem("editor.wrap", newWrap ? "on" : "off");
           } catch {}
         }}
-        className="px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+        className="px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl  bg-slate-200 dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:bg-slate-800 hover:text-white dark:hover:bg-slate-700 transition-colors"
         title={wrap ? "Matikan word wrap" : "Nyalakan word wrap"}
       >
         <span suppressHydrationWarning>{wrap ? "No Wrap" : "Wrap"}</span>
@@ -95,12 +95,12 @@ const EditorContent = ({
 
     <div className="mt-3 flex gap-1 xl:gap-2 flex-wrap">
       {[
-        { label: "Copy", onClick: onCopy },
-        { label: "Format", onClick: onFormatAll },
-        { label: "Reset", onClick: onReset },
-        { label: "Download", onClick: onDownload },
-      ].map(({ label, onClick }) => (
-        <button key={label} onClick={onClick} className="px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+        { label: "Copy", onClick: onCopy, className: "bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50" },
+        { label: "Format", onClick: onFormatAll, className: "bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-700 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/50" },
+        { label: "Reset", onClick: onReset, className: "bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/50" },
+        { label: "Download", onClick: onDownload, className: "bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50" },
+      ].map(({ label, onClick, className }) => (
+        <button key={label} onClick={onClick} className={`px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl border transition-colors ${className}`}>
           {label}
         </button>
       ))}

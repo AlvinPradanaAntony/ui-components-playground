@@ -19,7 +19,7 @@ export default function LeftSidebar() {
           <button
             className={clsx(
               "text-xs lg:text-sm px-2 lg:px-3 py-1 rounded-md border border-gray-200 dark:border-gray-800",
-              activeCategoryId === "all" && "bg-brand-50 text-brand-700 dark:text-white"
+              activeCategoryId === "all" && "bg-brand-500 text-white"
             )}
             onClick={() => setActiveCategory("all")}
           >
