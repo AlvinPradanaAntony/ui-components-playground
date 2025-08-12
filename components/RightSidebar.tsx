@@ -5,6 +5,109 @@ import IconUploader from "@/components/IconUploader";
 import PreviewIframe from "@/components/PreviewIframe";
 import type { ComponentCode, StyleKind } from "@/types";
 import { useToast } from "@/components/ui/Toast";
+
+// Extract EditorContent as a separate component to prevent unnecessary re-renders
+type EditorContentProps = {
+  inDrawer?: boolean;
+  onIconChange?: (url: string) => void;
+  iconLabel?: string;
+  iconUrl?: string;
+  styleKind: StyleKind;
+  combined: ComponentCode;
+  tab: "html" | "css" | "js";
+  setTab: (tab: "html" | "css" | "js") => void;
+  wrap: boolean;
+  setWrap: (wrap: boolean) => void;
+  html: string;
+  css: string;
+  js: string;
+  setHtml: (html: string) => void;
+  setCss: (css: string) => void;
+  setJs: (js: string) => void;
+  onCopy: () => void;
+  onFormatAll: () => void;
+  onReset: () => void;
+  onDownload: () => void;
+};
+
+const EditorContent = ({
+  inDrawer = false,
+  onIconChange,
+  iconLabel,
+  iconUrl,
+  styleKind,
+  combined,
+  tab,
+  setTab,
+  wrap,
+  setWrap,
+  html,
+  css,
+  js,
+  setHtml,
+  setCss,
+  setJs,
+  onCopy,
+  onFormatAll,
+  onReset,
+  onDownload
+}: EditorContentProps) => (
+  <div className="p-2 xl:p-3">
+    {/* On desktop (aside), keep IconUploader here; on mobile/tablet it's rendered in main */}
+    {onIconChange && !inDrawer && (
+      <div className="mb-3">
+        <IconUploader label={iconLabel || "Icon/Thumbnail"} value={iconUrl || ""} onChange={onIconChange} />
+      </div>
+    )}
+
+    {/* On mobile/tablet drawer, show live preview above editor */}
+    {inDrawer && (
+      <div className="mb-3">
+        <div className="h-[55vh] sm:h-[60vh] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800">
+          <PreviewIframe styleKind={styleKind} code={combined} />
+        </div>
+      </div>
+    )}
+    <div className="flex items-center justify-between mb-3 gap-1 xl:gap-2">
+      <div className="flex gap-1 xl:gap-2">
+        {(["html", "css", "js"] as const).map((lang) => (
+          <button key={lang} onClick={() => setTab(lang)} className={`px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl border transition-colors ${tab === lang ? "bg-gray-100 dark:bg-gray-800" : "hover:bg-gray-50 dark:hover:bg-gray-900"}`}>
+            {lang.toUpperCase()}
+          </button>
+        ))}
+      </div>
+      <button
+        onClick={() => {
+          const newWrap = !wrap;
+          setWrap(newWrap);
+          try {
+            localStorage.setItem("editor.wrap", newWrap ? "on" : "off");
+          } catch {}
+        }}
+        className="px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+        title={wrap ? "Matikan word wrap" : "Nyalakan word wrap"}
+      >
+        <span suppressHydrationWarning>{wrap ? "No Wrap" : "Wrap"}</span>
+      </button>
+    </div>
+
+    <CodeEditor language={tab === "js" ? "javascript" : tab} value={tab === "html" ? html : tab === "css" ? css : js} onChange={tab === "html" ? setHtml : tab === "css" ? setCss : setJs} height={340} wrap={wrap} />
+
+    <div className="mt-3 flex gap-1 xl:gap-2 flex-wrap">
+      {[
+        { label: "Copy", onClick: onCopy },
+        { label: "Format", onClick: onFormatAll },
+        { label: "Reset", onClick: onReset },
+        { label: "Download", onClick: onDownload },
+      ].map(({ label, onClick }) => (
+        <button key={label} onClick={onClick} className="px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+          {label}
+        </button>
+      ))}
+    </div>
+    <div className="mt-6 text-xs text-gray-500">Edit kode lalu lihat hasilnya pada preview di tengah.</div>
+  </div>
+);
 type Props = {
   initialCode: ComponentCode;
   onCodeChange?: (code: ComponentCode) => void;
@@ -116,69 +219,33 @@ export default function RightSidebar({ initialCode, onCodeChange, styleKind = "n
       toast.error("Gagal auto format. Pastikan Prettier terpasang.");
     }
   };
-  const EditorContent = ({ inDrawer = false }: { inDrawer?: boolean }) => (
-    <div className="p-2 xl:p-3">
-      {/* On desktop (aside), keep IconUploader here; on mobile/tablet it's rendered in main */}
-      {onIconChange && !inDrawer && (
-        <div className="mb-3">
-          <IconUploader label={iconLabel} value={iconUrl || ""} onChange={onIconChange} />
-        </div>
-      )}
-
-      {/* On mobile/tablet drawer, show live preview above editor */}
-      {inDrawer && (
-        <div className="mb-3">
-          <div className="h-[55vh] sm:h-[60vh] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800">
-            <PreviewIframe styleKind={styleKind} code={combined} />
-          </div>
-        </div>
-      )}
-      <div className="flex items-center justify-between mb-3 gap-1 xl:gap-2">
-        <div className="flex gap-1 xl:gap-2">
-          {(["html", "css", "js"] as const).map((lang) => (
-            <button key={lang} onClick={() => setTab(lang)} className={`px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl border transition-colors ${tab === lang ? "bg-gray-100 dark:bg-gray-800" : "hover:bg-gray-50 dark:hover:bg-gray-900"}`}>
-              {lang.toUpperCase()}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={() => {
-            const newWrap = !wrap;
-            setWrap(newWrap);
-            try {
-              localStorage.setItem("editor.wrap", newWrap ? "on" : "off");
-            } catch {}
-          }}
-          className="px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
-          title={wrap ? "Matikan word wrap" : "Nyalakan word wrap"}
-        >
-          <span suppressHydrationWarning>{wrap ? "No Wrap" : "Wrap"}</span>
-        </button>
-      </div>
-
-      <CodeEditor language={tab === "js" ? "javascript" : tab} value={tab === "html" ? html : tab === "css" ? css : js} onChange={tab === "html" ? setHtml : tab === "css" ? setCss : setJs} height={340} wrap={wrap} />
-
-      <div className="mt-3 flex gap-1 xl:gap-2 flex-wrap">
-        {[
-          { label: "Copy", onClick: copy },
-          { label: "Format", onClick: formatAll },
-          { label: "Reset", onClick: reset },
-          { label: "Download", onClick: download },
-        ].map(({ label, onClick }) => (
-          <button key={label} onClick={onClick} className="px-2 xl:px-3 py-1.5 text-xs xl:text-sm rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-            {label}
-          </button>
-        ))}
-      </div>
-      <div className="mt-6 text-xs text-gray-500">Edit kode lalu lihat hasilnya pada preview di tengah.</div>
-    </div>
-  );
 
   return (
     <>
       {/* Desktop (xl+) sidebar */}
       <aside aria-label="Panel editor kode" className="h-[calc(100vh-3.5rem)] sticky top-14 w-[var(--rightbar-width)] shrink-0 overflow-y-auto border-l border-gray-200 bg-white dark:bg-gray-950 dark:border-gray-800 hidden xl:block">
-        <EditorContent inDrawer={false} />
+        <EditorContent
+          inDrawer={false}
+          onIconChange={onIconChange}
+          iconLabel={iconLabel}
+          iconUrl={iconUrl}
+          styleKind={styleKind}
+          combined={combined}
+          tab={tab}
+          setTab={setTab}
+          wrap={wrap}
+          setWrap={setWrap}
+          html={html}
+          css={css}
+          js={js}
+          setHtml={setHtml}
+          setCss={setCss}
+          setJs={setJs}
+          onCopy={copy}
+          onFormatAll={formatAll}
+          onReset={reset}
+          onDownload={download}
+        />
       </aside>
 
       {/* Mobile/Tablet trigger button */}
@@ -205,7 +272,28 @@ export default function RightSidebar({ initialCode, onCodeChange, styleKind = "n
                 </svg>
               </button>
             </div>
-            <EditorContent inDrawer={true} />
+            <EditorContent
+              inDrawer={true}
+              onIconChange={onIconChange}
+              iconLabel={iconLabel}
+              iconUrl={iconUrl}
+              styleKind={styleKind}
+              combined={combined}
+              tab={tab}
+              setTab={setTab}
+              wrap={wrap}
+              setWrap={setWrap}
+              html={html}
+              css={css}
+              js={js}
+              setHtml={setHtml}
+              setCss={setCss}
+              setJs={setJs}
+              onCopy={copy}
+              onFormatAll={formatAll}
+              onReset={reset}
+              onDownload={download}
+            />
           </section>
         </div>
       )}
