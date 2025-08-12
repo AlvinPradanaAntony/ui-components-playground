@@ -4,6 +4,7 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import { ValidationProvider } from "@/components/ui/ValidationModal";
 import Topbar from "@/components/Topbar";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "UI Components Playground",
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ValidationProvider>
               <Topbar />
               {children}
+              <Footer />
             </ValidationProvider>
           </ConfirmProvider>
         </ToastProvider>

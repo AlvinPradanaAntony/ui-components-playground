@@ -102,9 +102,21 @@ body {
 }
 
 /* Scrollbars */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 999px; }
-[data-theme="dark"] ::-webkit-scrollbar-thumb { background: hsl(var(--surface-200)); }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 999px;
+  transition: background-color 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--brand-400) / 0.6);
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: hsl(var(--surface-200));
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--brand-400) / 0.8);
+}
 
 /* Card primitive */
 .card {
