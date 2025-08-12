@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import CodeEditor from "@/components/CodeEditor";
 import IconUploader from "@/components/IconUploader";
 import PreviewIframe from "@/components/PreviewIframe";
@@ -127,10 +127,104 @@ export default function RightSidebar({ initialCode, onCodeChange, styleKind = "n
   const [mobileOpen, setMobileOpen] = useState(false);
   // Initialize uniformly for SSR/CSR to avoid hydration mismatch; load saved value after mount
   const [wrap, setWrap] = useState<boolean>(true);
+  
+  // Resizable sidebar state
+  const [sidebarWidth, setSidebarWidth] = useState<number>(0);
+  const [isResizing, setIsResizing] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const startXRef = useRef<number>(0);
+  const startWidthRef = useRef<number>(0);
+  
+  // Constants for resize constraints
+  const MIN_WIDTH = 280;
+  const MAX_WIDTH = 600;
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem("editor.wrap");
       if (saved) setWrap(saved === "on");
+    } catch {}
+  }, []);
+
+  // Initialize sidebar width from CSS variable
+  useEffect(() => {
+    const updateWidthFromCSS = () => {
+      const rootStyles = getComputedStyle(document.documentElement);
+      const currentWidth = rootStyles.getPropertyValue('--rightbar-width').trim();
+      if (currentWidth) {
+        const widthValue = parseInt(currentWidth.replace('px', ''));
+        setSidebarWidth(widthValue);
+      }
+    };
+    
+    updateWidthFromCSS();
+    
+    // Listen for window resize to update width based on responsive breakpoints
+    const handleResize = () => updateWidthFromCSS();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Update CSS variable when sidebar width changes
+  useEffect(() => {
+    if (sidebarWidth > 0) {
+      document.documentElement.style.setProperty('--rightbar-width', `${sidebarWidth}px`);
+    }
+  }, [sidebarWidth]);
+
+  // Mouse event handlers for resizing
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+    startXRef.current = e.clientX;
+    startWidthRef.current = sidebarWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, [sidebarWidth]);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizing) return;
+    
+    const deltaX = startXRef.current - e.clientX; // Negative deltaX increases width
+    const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, startWidthRef.current + deltaX));
+    setSidebarWidth(newWidth);
+  }, [isResizing]);
+
+  const handleMouseUp = useCallback(() => {
+    if (!isResizing) return;
+    
+    setIsResizing(false);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    
+    // Save the new width to localStorage
+    try {
+      localStorage.setItem('rightbar-width', sidebarWidth.toString());
+    } catch {}
+  }, [isResizing, sidebarWidth]);
+
+  // Add global mouse event listeners
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isResizing, handleMouseMove, handleMouseUp]);
+
+  // Load saved width from localStorage
+  useEffect(() => {
+    try {
+      const savedWidth = localStorage.getItem('rightbar-width');
+      if (savedWidth) {
+        const width = parseInt(savedWidth);
+        if (width >= MIN_WIDTH && width <= MAX_WIDTH) {
+          setSidebarWidth(width);
+        }
+      }
     } catch {}
   }, []);
   // Capture a reset baseline per item; do not update on every keystroke from parent
@@ -223,7 +317,23 @@ export default function RightSidebar({ initialCode, onCodeChange, styleKind = "n
   return (
     <>
       {/* Desktop (xl+) sidebar */}
-      <aside aria-label="Panel editor kode" className="h-[calc(100vh-3.5rem)] sticky top-14 w-[var(--rightbar-width)] shrink-0 overflow-y-auto border-l border-gray-200 bg-white dark:bg-gray-950 dark:border-gray-800 hidden xl:block">
+      <aside
+        ref={sidebarRef}
+        aria-label="Panel editor kode"
+        className="h-[calc(100vh-3.5rem)] sticky top-14 w-[var(--rightbar-width)] shrink-0 overflow-y-auto border-l border-gray-200 bg-white dark:bg-gray-950 dark:border-gray-800 hidden xl:block relative"
+      >
+        {/* Resize handle */}
+        <div
+          className={`absolute left-0 top-0 bottom-0 w-1 cursor-col-resize bg-transparent hover:bg-blue-500/20 transition-colors z-10 ${
+            isResizing ? 'bg-blue-500/30' : ''
+          }`}
+          onMouseDown={handleMouseDown}
+          title="Drag to resize sidebar"
+        >
+          {/* Visible handle indicator */}
+          <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gray-300 dark:bg-gray-600 rounded-r opacity-0 hover:opacity-100 transition-opacity" />
+        </div>
+        
         <EditorContent
           inDrawer={false}
           onIconChange={onIconChange}
